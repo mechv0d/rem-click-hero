@@ -26,6 +26,7 @@ function App() {
     <>
     <div className={`app-container ${gameState.isGameOver ? 'game-over-bg' : ''}`}>
       <h1 className="game-title">🎮 Click Hero</h1>
+      <h2>1ИСП-21 Рем Сергей, Креймер Максим, Краевская София</h2>
       
       <div className={`status-message ${gameState.statusType}`}>
         {gameState.statusMessage}

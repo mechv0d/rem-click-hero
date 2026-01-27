@@ -65,9 +65,9 @@ export const useLogic = () => {
 
     // Приоритет для сообщения: если герой сделал крит — показываем его крит, иначе если критнул орк — показываем крит орка, иначе обычное сообщение
     if (heroCrit) {
-      setGameState(prev => ({ ...prev, statusMessage: `💥 Крит! Герой нанес ${dmgDealt} урона`, statusType: 'crit' }));
+      setGameState(prev => ({ ...prev, statusMessage: `💥 КРИТ! Герой нанес ${dmgDealt} урона`, statusType: 'crit' }));
     } else if (enemyCrit) {
-      setGameState(prev => ({ ...prev, statusMessage: `💥 Крит! Орк нанес ${enemyDmg} урона`, statusType: 'crit' }));
+      setGameState(prev => ({ ...prev, statusMessage: `💥 КРИТ! Орк нанес ${enemyDmg} урона`, statusType: 'crit' }));
     } else {
       setGameState(prev => ({ ...prev, statusMessage: `Атака! Нанесено ${dmgDealt}, получено ${enemyDmg}`, statusType: 'neutral' }));
     }
@@ -76,10 +76,10 @@ export const useLogic = () => {
   const handleRest = () => {
     if (gameState.isGameOver) return;
     const success = rest();
-    if (success) {
+    if (success != false) {
       setGameState(prev => ({ ...prev, statusMessage: '✨ Отдых совершен: восстановлена энергия и ХП', statusType: 'neutral' }));
     } else {
-      setGameState(prev => ({ ...prev, statusMessage: '❌ Нет зарядов отдыха!', statusType: 'neutral' }));
+      setGameState(prev => ({ ...prev, statusMessage: '✨ Отдых совершен: восстановлена энергия и ХП', statusType: 'neutral' }));
     }
   };
 
