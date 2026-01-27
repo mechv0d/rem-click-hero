@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+body {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  font-family: 'Ubuntu Mono', monospace !important;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.app-container {
+  width: 600px;
+  max-width: 600px;
+  padding: 20px;
+  background-color: #222222;
+  box-shadow: 0 0 20px rgba(0,0,0,0.7);
+  border-radius: 10px;
+  margin: 0;
+  position: relative;
+}
+
+.game-title {
+  text-align: center;
+  color: #bb86fc;          /* светлый фиолетовый акцент */
+  margin-bottom: 20px;
+}
+
+.status-message {
+  text-align: center;
+  padding: 10px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 5px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  min-height: 24px;
+}
+.status-message.win { 
+  color: #2ecc71; 
+  border: 1px solid #2ecc71; 
+}
+.status-message.loss { 
+  color: #e74c3c; 
+  border: 1px solid #e74c3c; 
+}
+.status-message.crit {
+  background: #3c0a00;
+  border: 1px solid #e74c3c;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.5rem;
+}
+
+.battle-arena {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.vs {
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: #666666;
+}
+
+.card {
+  background: rgba(255,255,255,0.05);
+  padding: 15px;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.card.enemy-card {
+  position: inherit;
+  background: #111111cc;
+  float: left;
+  height: 255px;
+  box-sizing: border-box;
+}
+
+.card h3 { 
+  margin-top: 0; 
+  text-align: center; 
+}
+
+.stat-row {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-bar {
+  background: #333333;
+  height: 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.progress-bar div { 
+  height: 100%; 
+  transition: width 0.3s ease; 
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+.btn:active:not(:disabled) { 
+  transform: scale(0.98); 
+}
+.btn:disabled { 
+  opacity: 0.4; 
+  cursor: not-allowed; 
+}
+
+.attack-btn { 
+  background: #c0392b;      /* чуть более тёмный красный */
+  color: white; 
+}
+.rest-btn { 
+  background: #8e44ad;      /* основной фиолетовый акцент */
+  color: white; 
+}
+.restart-btn { 
+  background: #9b59b6;      /* светлее фиолетовый */
+  color: white; 
+  width: 100%; 
+  margin-bottom: 20px; 
+}
+
+.divider { 
+  border: 0; 
+  border-top: 1px solid #444444; 
+  margin: 20px 0; 
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+.shop {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shop h3 {
+  text-align: center;
+}
+
+.shop-item {
+  background: rgba(30,30,30,0.6);
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: space-between;
+  min-width: 140px;
+  flex: 0 0 auto;
+}
+
+.shop-icon { 
+  font-size: 1.5rem; 
+  margin-bottom: 4px; 
+}
+.shop-info { 
+  margin-bottom: 6px; 
+  font-size: 0.8rem; 
+}
+
+.shop-info label b {
+  display: inline-block;
+  margin-bottom: .5em;
+  font-size: 1rem;
+}
+
+.shop-bonus {
+  color: #ffffff90;
+}
+
+.buy-btn { 
+  background: #27ae60; 
+  color: white; 
+  width: 100%; 
+  padding: 6px; 
+  font-size: 1rem; 
+  flex: none;
+}
+
+.buy-btn:disabled {
+  background: none; 
+  border: 1px solid #555555; 
+  color: #777777;
+}
+
+.shop-category {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #2a2a2a;
+}
+
+/* Full width shop row styles */
+.shop-fullwidth {
+  width: 99vw;
+  box-sizing: border-box;
+  padding: 12px 8px;
+  margin-top: 10px;
+  background: transparent;
+  display: block;
+}
+
+.shop-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.shop-row .shop-item {
+  min-width: 120px;
+  max-width: 160px;
+}
+
+/* Desktop layout: shop sidebar */
+@media (min-width: 900px) {
+  body { justify-content: center; }
+  .app-container { width: 640px; max-width: 640px; padding: 22px; }
+  .shop-sidebar {
+    position: absolute;
+    left: -300px;
+    top: 120px;
+    width: 500px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .shop {
+    gap: 6px;
+  }
+  .shop-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .shop-item {
+    padding: 6px;
+  }
+}
+
+.shop-category-title {
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+
+.shop-category-title.shop-cat-ultra {
+  color: #bb86fc;           /* светлый фиолетовый для ультра-категории */
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.4rem;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+}
+
+button {
+  font-family: 'Ubuntu Mono', monospace !important;
+}
