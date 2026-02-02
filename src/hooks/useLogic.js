@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { ENEMY_RESPAWN_DELAY_MS } from '../config';
 import { useHero } from './useHero';
 import { useEnemy } from './useEnemy';
 
 export const useLogic = () => {
-  const { hero, performAttack: heroAttackAction, takeDamage: damageHero, rest, buyUpgrade, resetHero, restoreRestCharge, buyRestCharge } = useHero();
-  const { enemy, takeDamage: damageEnemy, dealDamage: getEnemyDamage, increaseDamage, increaseCritChance, resetEnemy } = useEnemy();
+  const { hero, performAttack: heroAttackAction, takeDamage: damageHero, rest, buyUpgrade, resetHero, restoreRestCharge, buyRestCharge, gainLevel, addExp, expRequiredForLevel, addGold } = useHero();
+  const { enemy, takeDamage: damageEnemy, dealDamage: getEnemyDamage, increaseDamage, increaseCritChance, resetEnemy, spawnRandomEnemy } = useEnemy();
+  const [isSearchingNewEnemy, setIsSearchingNewEnemy] = useState(false);
+  const respawnTimeoutRef = useRef(null);
   const [attackCount, setAttackCount] = useState(0);
   
   const [gameState, setGameState] = useState({
@@ -19,12 +22,16 @@ export const useLogic = () => {
 
     if (hero.heroHp <= 0) {
       setGameState({ isGameOver: true, statusMessage: '💀 Герой пал в бою', statusType: 'loss' });
-    } else if (enemy.enemyHp <= 0) {
-      setGameState({ isGameOver: true, statusMessage: '🏆 Вы победили врага!', statusType: 'win' });
-    } else if (hero.gold >= 100) {
-      setGameState({ isGameOver: true, statusMessage: '💰 Вы собрали 100 золота! Победа!', statusType: 'win' });
+    } else if (hero.gold >= 1000) {
+      setGameState({ isGameOver: true, statusMessage: '💰 Вы собрали 1000 золота! Победа!', statusType: 'win' });
     }
-  }, [hero.heroHp, hero.gold, enemy.enemyHp, gameState.isGameOver]);
+  }, [hero.heroHp, hero.gold, gameState.isGameOver]);
+
+  // Инициализация первого врага при старте
+  useEffect(() => {
+    spawnRandomEnemy(hero.level || 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAttack = () => {
     if (gameState.isGameOver) return;
@@ -61,6 +68,41 @@ export const useLogic = () => {
       enemyDmg = enemyAttack.damage;
       enemyCrit = enemyAttack.isCrit;
       if (enemyDmg > 0) damageHero(enemyDmg);
+    } else {
+    // враг убит — даём EXP и случайный дроп золота герою, считаем возможные повышения уровня
+      const enemyExp = enemy.exp || 0;
+      const goldMin = (enemy.goldMin || 0);
+      const goldMax = (enemy.goldMax || 0);
+      const coinDrop = goldMax >= goldMin ? Math.floor(Math.random() * (goldMax - goldMin + 1)) + goldMin : 0;
+
+      // локально вычисляем новый уровень после добавления EXP (не полагаемся на асинхронный setState)
+      let projectedExp = (hero.exp || 0) + enemyExp;
+      let projectedLevel = hero.level || 1;
+      while (projectedExp >= expRequiredForLevel(projectedLevel)) {
+        projectedExp -= expRequiredForLevel(projectedLevel);
+        projectedLevel += 1;
+      }
+
+      // применяем EXP и золото к герою
+      addExp(enemyExp);
+      if (coinDrop > 0) addGold(coinDrop);
+      // пометим что ищем нового врага и покажем сообщение, затем через задержку заспавним нового
+      setIsSearchingNewEnemy(true);
+      const levelGain = (projectedLevel - (hero.level || 1));
+      setGameState(prev => ({ ...prev, statusMessage: `🏆 Враг повержен! Получено ${enemyExp} EXP и ${coinDrop} золота${levelGain > 0 ? ` — уровень +${levelGain} (теперь ${projectedLevel})` : ''}`, statusType: 'win' }));
+
+      // очистка старого таймаута, если есть
+      if (respawnTimeoutRef.current) {
+        clearTimeout(respawnTimeoutRef.current);
+        respawnTimeoutRef.current = null;
+      }
+
+      respawnTimeoutRef.current = setTimeout(() => {
+        spawnRandomEnemy(projectedLevel);
+        setIsSearchingNewEnemy(false);
+        setGameState(prev => ({ ...prev, statusMessage: '🔍 Новый враг найден!', statusType: 'neutral' }));
+        respawnTimeoutRef.current = null;
+      }, ENEMY_RESPAWN_DELAY_MS);
     }
 
     // Приоритет для сообщения: если герой сделал крит — показываем его крит, иначе если критнул орк — показываем крит орка, иначе обычное сообщение
@@ -107,12 +149,19 @@ export const useLogic = () => {
     resetHero();
     resetEnemy();
     setAttackCount(0);
+    // очистим таймаут респауна если был
+    if (respawnTimeoutRef.current) {
+      clearTimeout(respawnTimeoutRef.current);
+      respawnTimeoutRef.current = null;
+    }
+    setIsSearchingNewEnemy(false);
     setGameState({ isGameOver: false, statusMessage: 'Бой начался заново!', statusType: 'neutral' });
   };
 
   return {
     hero,
     enemy,
+    isSearchingNewEnemy,
     gameState,
     actions: {
       attack: handleAttack,

@@ -1,11 +1,11 @@
 import React from 'react';
 
-const Controls = ({ onAttack, onRest, onBuyCharge, isGameOver, energy, restCharges, maxRestCharges, restChargeCost }) => (
+const Controls = ({ onAttack, onRest, onBuyCharge, isGameOver, energy, restCharges, maxRestCharges, restChargeCost, searchingNew }) => (
   <div className="controls">
     <button 
       className="btn attack-btn" 
       onClick={onAttack} 
-      disabled={isGameOver || energy === 0}
+      disabled={isGameOver || energy === 0 || searchingNew}
     >
       ⚔️ Атаковать
     </button>

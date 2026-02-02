@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { calculateCost } from '../hooks/useHero';
 const CATEGORY_NAMES = {
   attack: 'Атака',
   hp: 'Здоровье',
@@ -10,7 +10,7 @@ const CATEGORY_NAMES = {
   misc: 'Остальное'
 };
 
-const Shop = ({ upgrades, onBuy, currentGold, isGameOver }) => {
+const Shop = ({ upgrades, onBuy, currentGold, isGameOver, purchasedItems = {}, heroLevel = 1 }) => {
   // Группируем предметы по категориям в порядке первого появления
   const groups = {};
   const order = [];
@@ -33,16 +33,23 @@ const Shop = ({ upgrades, onBuy, currentGold, isGameOver }) => {
   return (
     <div className="shop">
       <h3>🛒 Потайная лавка</h3>
+      <div className="shop-content">
       {ordered.map(cat => (
         <div key={cat} className="shop-category">
           <h4 className={`shop-category-title shop-cat-${cat}`}>{CATEGORY_NAMES[cat] || cat}</h4>
-          <div className="shop-row">
-            {groups[cat].map(item => (
+          <div className="shop-column">
+            {groups[cat].map(item => {
+              const boughtCount = (purchasedItems && purchasedItems[item.id]) || 0;
+              const scaledCost = calculateCost(item.cost, heroLevel, item.priceMultOnBoughtQuantity, boughtCount)
+              return (
               <div key={item.id} className="shop-item">
                 <div className="shop-icon">{item.icon}</div>
                 <div className="shop-info">
                   <label><b>{item.name}</b></label>
-                  <div className="shop-cost"></div>
+                  {purchasedItems && purchasedItems[item.id] > 0 && (
+                    <div className="shop-count">Куплено: {purchasedItems[item.id]}</div>
+                  )}
+                
                   <div className="shop-bonuses">
                     {item.dmgBonus > 0 && <div className="shop-bonus">+{item.dmgBonus} ДМГ</div>}
                     {item.hpBonus > 0 && <div className="shop-bonus">+{item.hpBonus} ХП</div>}
@@ -55,16 +62,19 @@ const Shop = ({ upgrades, onBuy, currentGold, isGameOver }) => {
                 </div>
                 <button
                   className="btn buy-btn"
-                  disabled={isGameOver || currentGold < item.cost}
+                  disabled={isGameOver || currentGold < scaledCost}
                   onClick={() => onBuy(item)}
                 >
-                  {item.cost}💰
+                  {scaledCost}💰
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}
+      </div>
+      
     </div>
   );
 };
